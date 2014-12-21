@@ -15,7 +15,7 @@ USES:
 ==========================================================
 For visual response, 13th Arduino Digital I/O pin is set
 as output to drive on-board LED. LED flashes briefly every
-minute.
+second and for 1 second every 60 secs.
 If LEDs are connected to PIN2 - PIN7, one can see real time
 value of variale 's' (PIN2 is LSB).
 */
@@ -23,18 +23,19 @@ value of variale 's' (PIN2 is LSB).
 #include<avr/sleep.h>
 #include<avr/interrupt.h>
 
-volatile int m=0,h=0,d=0,s=0;
-volatile int ms=0;
+volatile uint8_t m,h,d,s;
+volatile int ms;
 
 ISR (TIMER2_COMP_vect){
   ms += 2;
+  if (s != 0 )
+    PORTB = 0;
   if (ms==1000){
     ms = 0;
     s++;
     PORTD = s<<2;//update portD every second
-    PORTB = 0;
+    PORTB = 1<<5;
     if (s==60){
-      PORTB ^= 1<<5;//flash LED
       s = 0;
       m++;
       if (m==60){
