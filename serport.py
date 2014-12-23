@@ -6,6 +6,9 @@ import serial, argparse, time
 parser = argparse.ArgumentParser(description="Plot data from arduino, specify frequency of data.")
 parser.add_argument("rate", help="Packet interval in milliseconds", type=int)
 args = parser.parse_args()
+# Next line, first argument is the serial port being used by the device
+# It should be the same one as you see @ bottom right corner of ARDUINO IDE
+# afer connecting the device
 ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=None)
 
 #main reading stuff

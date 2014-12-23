@@ -1,21 +1,11 @@
 /*
-System Clock 16MHz sourced from external Crystal Oscillator
-  which is on-board.
 Implements USART (transit only) in the following Data Packet Format:
-  <size>		sz	1 byte
-  <data0>		data0	1 byte
-  .		.	.
-  .		.	.
-  <data{sz-1}>	.	.
-Thus totally {sz+1} bytes are required.
-This format could be easily changed to *fixed size* format, if needed.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USES:
-  PORTD 0,1 (PORTD0-1){RX and TX}
-  >>>>as USART pins
-----------------------------------------------------------------------
-The program writes 'count' every 2msec (when wFlag is set) and
-decrements it.
+  Content       Symbol Size
+  <size>		    sz	   1 byte
+  <data0>		    data0	 1 byte
+  .             .      .
+  .		          .	     .
+  <data{sz-1}>	.	     .
 */
 #include<avr/io.h>
 #include<avr/interrupt.h>
