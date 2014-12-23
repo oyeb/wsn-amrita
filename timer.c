@@ -1,23 +1,5 @@
 /*
-System Clock 16MHz sourced from external Crystal Oscillator
-  which is on-board.
-Counter updated with SYS_clock(16MHz) prescaled by 128
-  Freq_TIMER2 = 16MHz/128 = 125kHz
-TIMER2 interrupts after every 250 clock pulses,
-  1 pulse = 1/125kHz = 8 usec
-  250 pulses         = 2 msec
-ms, s, m, h, d are global TIME variables.
-If need be, will implement a TIME struct in future.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USES:
-  PIN 2-7(PORTD2-7), 13(PORTB5)
-  >>>as O/P
-==========================================================
-For visual response, 13th Arduino Digital I/O pin is set
-as output to drive on-board LED. LED flashes briefly every
-second and for 1 second every 60 secs.
-If LEDs are connected to PIN2 - PIN7, one can see real time
-value of variale 's' (PIN2 is LSB).
+  Refer README and wiki for details
 */
 #include<avr/io.h>
 #include<avr/sleep.h>
