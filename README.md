@@ -2,8 +2,8 @@
 [//]: # (This is a comment)
 [//]: # (This document is written in markdown. I recommend editing this on Github or markdown- here.com/livedemo.html)
 
-*Read the wiki before cloning!.*
-**Don't forget to update this README in each commit!**
+*Read the wiki before cloning!*
+** Don't forget to update this README in each commit!**
 
 ----
 Implements a Software Timer of 2 msec resolution using *TIMER2*. MCU sleeps in idle mode for *>90%* time.
@@ -21,7 +21,7 @@ Description
 TIMER2 interrupts after every 250 (OCR2 == 250) clock pulses,
 
   | 1 pulse = 1/125kHz | 8 usec |
-  | --- | --- |
+  | --- | ---:|
   | 250 pulses | 2 msec |
 * ms, s, m, h, d are global TIME variables.
 * If need be, will implement a TIME struct in future.
