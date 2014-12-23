@@ -2,8 +2,8 @@
 [//]: # (This is a comment)
 [//]: # (This document is written in markdown. I recommend editing this on Github or markdown- here.com/livedemo.html)
 
-*Read the wiki before cloning!*
-** Don't forget to update this README in each commit!**
+*Read the wiki before cloning!*  
+**Don't forget to update this README in each commit!**
 
 ----
 Implements a Software Timer of 2 msec resolution using *TIMER2*. MCU sleeps in idle mode for *>90%* time.
