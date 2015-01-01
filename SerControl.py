@@ -11,9 +11,17 @@
  this.
  
  CURRENTLY
-   Only listens on port, does not send any data.
-   GUI freezes upon pressing 'Connect' as a busy-while loop vlocks everything
-   Must handover that task to a thread...
+   Fully Functional!!!
+ 
+ BUGS
+   Terminal that is used to open this Program gets blocked even though the GUI
+     window has been closed.
+     - Thread for polling port does not properly terminate
+      /*********************************************************\
+     -|   Every connect-disconnect cycle spawns a new thread!!  |
+      | It is recomended that you kill the terminal after a few |
+      | cycles, say 3.                                          |
+      \*********************************************************/
 '''
 import Tkinter as tk
 import Queue, serial, threading
@@ -30,6 +38,8 @@ class Application(tk.Frame):
     self.ser = serial.Serial()
     # a status flag, denotes whether we have opened a serial port
     self.serUP = False
+    self.q = Queue.Queue()
+    self.io = ioThread(self.q, self.ser)
     self.createWidgets()
   
   def createWidgets(self):
@@ -63,25 +73,32 @@ class Application(tk.Frame):
       self.ser.timeout = None
       self.ser.open()
       self.serUP = True
-      print '*_* Opened', PORT, 'listening for messages!'
-      while True:
-        data = self.ser.read()
-        if not data == '':	#enter if-block only if some data has been sent to PC
-          sz = ord(data)	#ord converts char to int
-          info = 0		#actual data sent in packet (currently only working with ints)
-          for i in range(0,sz):
-            data = self.ser.read()
-            info += ord(data)*(256**i)	#some trivial math
-          if info>60000:
-            print '* ', info
-          else:
-            print info
+      try:
+        #start thread to listen on port
+        self.io.start()
+        #start polling function
+        self.processQ()
+        self.oflux.insert('1.0', '*_* Opened '+PORT+', now listening for messages!\n')
+      except:
+        self.oflux.insert('1.0', '*_* Some thread error, restart propram!\n')
     except:
-      print '*_* Error in setting up port @ ', PORT
+      self.oflux.insert('1.0', '*_* Error in setting up port @ ', PORT, '\n')
+  
+  def processQ(self):
+    while self.q.qsize():
+      try:
+        self.iflux.insert('1.0', self.q.get(0)+'\n')
+      except Queue.Empty:
+        pass
+    if self.serUP:
+      self.after(10, self.processQ)
 
   def end_ser(self):
     if self.serUP:
+      self.io.end()
       self.ser.close()
+      self.oflux.insert('1.0', '*_* Closed port: '+PORT+'\n')
+      self.q.put('*_* Session closed normally --------------\n')
       self.serUP = False
   
   def __parse(self, event):
@@ -90,6 +107,35 @@ class Application(tk.Frame):
       # log the command onto the pink pane
       self.oflux.insert('1.0', cmd+'\n')
     self.cmd.delete('2', tk.END)
+    self.ser.write(cmd[2:])
+
+class ioThread:
+  def __init__(self, queue, ser):
+    self.q = queue
+    self.ser = ser
+    self.running = False
+  
+  def start(self):
+    self.running = True    
+    self.influx = threading.Thread(target=self.listen)
+    self.influx.start()    
+
+  def end(self):
+    self.running = False
+  
+  def listen(self):
+    while self.running:
+      data = self.ser.read()
+      if not data == '':	#enter if-block only if some data has been sent to PC
+        sz = ord(data)	#ord converts char to int
+        info = 0		#actual data sent in packet (currently only working with ints)
+        for i in range(0,sz):
+          data = self.ser.read()
+          info += ord(data)*(256**i)	#some trivial math
+        if info>60000:
+          self.q.put('* '+str(info))
+        else:
+          self.q.put(str(info))
 
 app = Application()
 app.master.title('T.A.L.K')

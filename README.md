@@ -31,6 +31,16 @@ The file `tk0.py` is a framework for making a GUI to simultaneously
 On the terminal, we can't do this simultaneously since asking for user input blocks polling of the port data. The program needs to spawn another thread to ask for user input and let the OS handle the rest.
 It's better to make a GUI with 2 panes and a command entry box.
 
+The GUI is now stable and functional! But, from a holistic point of view, it **does not use Threads in the correct manner**. Care must be taken when using it, the wrong implementation is, I repeat, functional though.
+
+####BUGS
+Terminal that is used to open this Program gets blocked even though the GUI window has been closed.
+
+- Thread for polling port does not properly terminate
+> Every connect-disconnect cycle spawns a new thread!!
+> It is recomended that you kill the terminal after a few cycles, say 3.
+
+
 Build Instructions
 ----------------------
 1. Upload serial.c using Arduino IDE
@@ -38,4 +48,6 @@ Build Instructions
    Copy that into `serport.py` as indicated in the comments there.
 3. Run serport.py using
     `<your working dir>$ python serport.py 1`
+4. If instead you wish to use the GUI to send commands to the device as well, heres what you do:
+    `<your working dir>$ python SerControl.py`
     
