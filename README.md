@@ -37,8 +37,10 @@ The GUI is now stable and functional! But, from a holistic point of view, it **d
 Terminal that is used to open this Program gets blocked even though the GUI window has been closed.
 
 - Thread for polling port does not properly terminate
-> Every connect-disconnect cycle spawns a new thread!!
-> It is recomended that you kill the terminal after a few cycles, say 3.
+```
+Every connect-disconnect cycle spawns a new thread!!
+It is recomended that you kill the terminal after a few cycles, say 3.
+```
 
 
 Build Instructions
