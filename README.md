@@ -21,6 +21,11 @@ This format could be easily changed to *fixed size* format, if needed.
 
 The program writes 'count' every 2msec (when `wFlag` is set) and decrements it.
 
+About the GUI
+--------------
+The file tk0.py is a framework for making a GUI to simultaneously view Port incoming data *and* send commands. On the terminal, we can't do this simultaneously since asking for user input blocks polling of the port data. The program needs to spawn another thread to ask for user input and let the OS handle the rest.
+It's better to make a GUI with 2 panes and a command entry box.
+
 Build Instructions
 ----------------------
 1. Upload serial.c using Arduino IDE
