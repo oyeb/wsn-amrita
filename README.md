@@ -34,11 +34,11 @@ It's better to make a GUI with 2 panes and a command entry box.
 The GUI is now stable and functional! But, from a holistic point of view, it **does not use Threads in the correct manner**. Care must be taken when using it, the wrong implementation is, I repeat, functional though.
 
 ####BUGS
-Terminal that is used to open this Program gets blocked even though the GUI window has been closed.
+Terminal that is used to open this Program gets blocked even though the GUI window has been closed. That's because:
 
-- Thread for polling port does not properly terminate
+- Thread for polling port does not properly terminate, even if [Disconnect] is pressed.
 ```
-Every connect-disconnect cycle spawns a new thread!!
+Every [Connect]-[Disconnect] (without killing the GUI, or in other words, in a single session) cycle spawns a new thread!!
 It is recomended that you kill the terminal after a few cycles, say 3.
 ```
 
