@@ -20,10 +20,11 @@ This format could be easily changed to *fixed size* format, if needed.
   as USART pins
 
 The program writes 'count' every 2msec (when `wFlag` is set) and decrements it.
+The program reads the port when `rFlag` is set.
 
 About the GUI
 --------------
-The file `tk0.py` is a framework for making a GUI to simultaneously
+The file `SerControl.py` is a framework for making a GUI to simultaneously
 
 1. view Port incoming data *and*
 2. send commands
@@ -39,17 +40,18 @@ Terminal that is used to open this Program gets blocked even though the GUI wind
 - Thread for polling port does not properly terminate, even if [Disconnect] is pressed.
 ```
 Every [Connect]-[Disconnect] (without killing the GUI, or in other words, in a single session) cycle spawns a new thread!!
-It is recomended that you kill the terminal after a few cycles, say 3.
+It is recomended that you kill the terminal (killing the GUI is not enough) after a few cycles, say 3.
 ```
 
 
 Build Instructions
-----------------------
+-------------------
 1. Upload serial.c using Arduino IDE
 2. Note the portID (in the bottom-right corner of ARDUINO IDE) used by the freeduino, for ex, it could be `/dev/tty/USB0`.
    Copy that into `serport.py` as indicated in the comments there.
-3. Run serport.py using
+3. [*Not Recommended*]
+    Run serport.py using
     `<your working dir>$ python serport.py 1`
-4. If instead you wish to use the GUI to send commands to the device as well, heres what you do:
+4. If instead you wish to use the GUI to send commands to the device as well, here's what you do:
     `<your working dir>$ python SerControl.py`
     
