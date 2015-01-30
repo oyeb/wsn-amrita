@@ -19,8 +19,8 @@
      - Thread for polling port does not properly terminate
       /*********************************************************\
      -|   Every connect-disconnect cycle spawns a new thread!!  |
-      | It is recomended that you kill the terminal after a few |
-      | cycles, say 3.                                          |
+      |   It is recomended that you kill the terminal, NOT JUST |
+      |   THE GUI after a few cycles, say 3.                    |                      |
       \*********************************************************/
 '''
 import Tkinter as tk
