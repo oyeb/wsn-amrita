@@ -12,6 +12,8 @@
  
  CURRENTLY
    Fully Functional!!!
+   This should be used with ADCtest.c
+   The raw int value is converted to volts in this program @lines 13x, 14x
  
  BUGS
    Terminal that is used to open this Program gets blocked even though the GUI
@@ -87,7 +89,7 @@ class Application(tk.Frame):
   def processQ(self):
     while self.q.qsize():
       try:
-        self.iflux.insert('1.0', self.q.get(0)+'\n')
+        self.iflux.insert('1.0', str(self.q.get(0))+'\n')
       except Queue.Empty:
         pass
     if self.serUP:
@@ -96,6 +98,8 @@ class Application(tk.Frame):
   def end_ser(self):
     if self.serUP:
       self.io.end()
+      self.ser.flushInput()
+      self.ser.flushOutput()
       self.ser.close()
       self.oflux.insert('1.0', '*_* Closed port: '+PORT+'\n')
       self.q.put('*_* Session closed normally --------------\n')
@@ -132,10 +136,13 @@ class ioThread:
         for i in range(0,sz):
           data = self.ser.read()
           info += ord(data)*(256**i)	#some trivial math
+        self.q.put(info * 0.004882813)
+        '''
         if info>60000:
           self.q.put('* '+str(info))
         else:
           self.q.put(str(info))
+        '''
 
 app = Application()
 app.master.title('T.A.L.K')
