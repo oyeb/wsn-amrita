@@ -1,12 +1,12 @@
-/*
-  Refer README and wiki for details
-*/
-#include<avr/io.h>
-#include<avr/sleep.h>
-#include<avr/interrupt.h>
+#include "timer.h"
 
-volatile uint8_t m,h,d,s;
-volatile int ms;
+void _initTimer(){
+  //setup TIMER2 (8bit) in CTC
+  TCNT2 = 0;
+  OCR2 = 0xF9; //2 msec (250 states)
+  TIMSK |= 1<<OCIE2; //enable compare match with OCR2
+  TCCR2 |= (1<<WGM21) | (1<<CS22) | (1<<CS20); //set CTC and 128 prescaler
+}
 
 ISR (TIMER2_COMP_vect){
   ms += 2;
@@ -29,23 +29,5 @@ ISR (TIMER2_COMP_vect){
         }
       }
     }
-  }
-}  
-
-int main(){
-  //sleep-mode == idle mode
-  MCUCR |= 1<<SE;
-  //setup TIMER2 (8bit) in CTC
-  TCNT2 = 0;
-  OCR2 = 0xF9; //2 msec (250 states)
-  TIMSK |= 1<<OCIE2; //enable compare match with OCR2
-  TCCR2 |= (1<<WGM21) | (1<<CS22) | (1<<CS20); //set CTC and 128 prescaler
-  PORTB = 1<<5;//LED initial on
-  //timer has started!
-  DDRB = 1<<5;
-  DDRD = 0xFC;
-  sei();
-  while (1){
-    sleep_cpu();//always
   }
 }
