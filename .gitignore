@@ -1,4 +1,8 @@
 *.o
+*.d
+*.elf
+*.eep
+*.hex
 *.dll
 *~
 *.lib

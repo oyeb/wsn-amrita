@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
-#include <avr/interrupt.h>
-#include "timer.h"
+#include "utimer.h"
+
 int main(){
   //sleep-mode == idle mode
   MCUCR |= 1<<SE;
