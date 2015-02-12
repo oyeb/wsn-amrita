@@ -7,6 +7,7 @@
 
 ----
 Implements a Software Timer of 2 msec resolution using *TIMER2*. MCU sleeps in idle mode for *>90%* time.
+
 Scheduler has been modularised. Just make the schedule changes in `utimer.c` and include `utimer.h` in the "MAIN" code and setup the Makefile for your "MAIN".
 
 **Future Work**
@@ -38,5 +39,15 @@ Build Instructions
 ------------------
 Just open timerOLD.c (that is a test file) in Arduino IDE and upload to device. On-board LED should start blinking as decribed above!
 Actual Instructions for building the project:
+
+For visual response, 13th Arduino Digital I/O pin is set as output to drive on-board LED. LED flashes briefly every second and for 1 second every 60 secs.
+If LEDs are connected to PIN2 - PIN7, one can see real time value of variable 's' (PIN2 is LSB).
+
+Build Instructions
+------------------
+Just open timerOLD.c (that is a test file) in Arduino IDE and upload to device. On-board LED should start blinking as decribed above!
+
+Actual Instructions for building the project:
+
 1. Run `make timer-main`.
 2. To flash the code run `make flash`.
