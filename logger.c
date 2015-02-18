@@ -6,7 +6,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #define BAUD_PRESCALE (F_CPU / (9600 * 16UL)) - 1
-#define Q_SIZE 10
+#define Q_SIZE 10 //Q_SIZE * 2 * CHANNELS + 3 + 1 ~ Q_SIZE * 2
 #define CHANNELS 1
 
 volatile uint8_t m,h,d,s;
@@ -85,11 +85,21 @@ int port_w(int sz, int *data){
  return 0;
 }
 
+void parse(char *rx){
+  switch (*rx){
+  case 'd': //user wants to download LOG
+    wFlag = 1;
+    break;
+  }
+}
+
 ISR (TIMER2_COMP_vect){
   ms += 2;
   PORTB = 0;
-  if (ms%500 == 0) sFlag = 1;
+  rFlag = 1;
+  //if (ms%500 == 0) sFlag = 1;
   if (ms==1000){
+    sFlag = 1;
     ms = 0;
     s++;
     if (s==60){
@@ -108,18 +118,21 @@ ISR (TIMER2_COMP_vect){
 }
 
 int main(){
-  uint8_t sCnt = 0;
   char rx, tx;
   _data senseD;
+  //set sleep mode to idle
   MCUCR |= 1<<SE;
+  //setup timer
   TCNT2 = 0;
   OCR2 = 0xF9; //2 msec (250 states)
   TIMSK |= 1<<OCIE2; //enable compare match with OCR2
+  //setup serial intf.
   UCSRB |= (1<<RXEN) | (1<<TXEN);
   UCSRC |= (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);
   UBRRH = (BAUD_PRESCALE)>>8;
   UBRRL = BAUD_PRESCALE;
   TCCR2 |= (1<<WGM21) | (1<<CS22) | (1<<CS20); //set CTC and 128 prescaler
+  //PORTB LED for visual feedback
   DDRB |= (1<<5);
   
   struct _Queue logs;
@@ -127,17 +140,17 @@ int main(){
   
   sei();
   while (1){
-    /*if (wFlag){
+    if (wFlag){
       WriteQ(&logs);
-    }*/
+      wFlag = 0;
+    }
     if (rFlag){
       if (UCSRA & (1<<RXC)){
         if (UCSRA & (1<<FE) || UCSRA & (1<<DOR) || UCSRA & (1<<PE)) ;//resend pls!!
         else{
           //actual read instructions
           rx = UDR;
-          //parse(rx);
-          //count = 1024;
+          parse(&rx);
         }
       }
       rFlag=0;
@@ -147,26 +160,21 @@ int main(){
       ADMUX |= (1<<REFS0); //Use AVcc as Vref
       ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
       //Enable and 128 prescaler
-      ADMUX &= ~(1<<MUX0|1<<MUX1|1<<MUX2|1<<MUX3);
+      ADMUX &= ~(1<<MUX0|1<<MUX1|1<<MUX2|1<<MUX3); //select ADC0 pin
       ADCSRA |= (1<<ADSC); //Start conversion
-      while (ADCSRA & (1<<ADSC));
-      senseD.data[0] = (ADCL + (ADCH<<8));
+      while (ADCSRA & (1<<ADSC)); //wait till its done
+      senseD.data[0] = (ADCL + (ADCH<<8)); //pack it in senseD
     /*
-      ADMUX &= ~(1<<MUX1|1<<MUX2|1<<MUX3);
+      ADMUX &= ~(1<<MUX1|1<<MUX2|1<<MUX3); //select ADC1 pin
       ADCSRA |= (1<<ADSC); //Start conversion
-      while (ADCSRA & (1<<ADSC));
-      senseD.data[1] = (ADCL + (ADCH<<8));
+      while (ADCSRA & (1<<ADSC)); //wait till its done
+      senseD.data[1] = (ADCL + (ADCH<<8)); //pack it in senseD
       .
       .
       other channels
     */
-      ADCSRA &= ~(1<<ADEN); //turn it off
-      Insert(&logs, &senseD);
-      sCnt++;
-      if (sCnt > 5){
-        WriteQ(&logs);
-        sCnt = 0;
-      }
+      ADCSRA &= ~(1<<ADEN); //turn ADC off
+      Insert(&logs, &senseD); //store in log
       sFlag = 0;
     }
   sleep_cpu();
