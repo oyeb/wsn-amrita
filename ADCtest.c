@@ -2,8 +2,9 @@
   Setup timer and serial.
   Poll ADC for "single conversion" every k ms and send over serial.
 */
-#include<avr/io.h>
-#include<avr/interrupt.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
 #define BAUD_PRESCALE (F_CPU / (9600 * 16UL)) - 1
 
 volatile uint8_t m,h,d,s;
@@ -12,7 +13,7 @@ volatile uint8_t rFlag, wFlag, sFlag;
 
 ISR (TIMER2_COMP_vect){
   ms += 2;
-  sFlag = 1;
+  if (ms%50 == 0) sFlag = 1;
   if (ms==1000){
     ms = 0;
     s++;
@@ -46,6 +47,7 @@ int main(){
   int count = 0;
   char rx, tx;
   TCNT2 = 0;
+  MCUCR |= 1<<SE;
   OCR2 = 0xF9; //2 msec (250 states)
   TIMSK |= 1<<OCIE2; //enable compare match with OCR2
   UCSRB |= (1<<RXEN) | (1<<TXEN);
@@ -84,6 +86,7 @@ int main(){
       sFlag = 0;
       ADCSRA &= ~(1<<ADEN); //turn it off
     }
+    sleep_cpu();
   }
   return 0;
 }
