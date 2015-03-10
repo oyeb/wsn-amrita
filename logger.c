@@ -14,28 +14,32 @@ volatile int ms;
 volatile uint8_t rFlag, wFlag, sFlag;
 
 struct _data{
+  /*
+   * Sensed data packet. Currently using only 1 channel so it's trivial
+  */
   int data[CHANNELS];
 };
 
-struct _status{
+struct _status{//its h,m,s for testing
   uint8_t day, hour, min;
 };
 
 void updateStatus(struct _status *sts){
-  sts->day = d;
-  sts->hour = h;
-  sts->min = m;
+  sts->day = h;//its h,m,s for testing
+  sts->hour = m;
+  sts->min = s;
 }
 
 struct _Queue{
   struct _data logData[Q_SIZE];
-  struct _status lastSync;
+  struct _status lastSync, lastSense;
   uint8_t sz, front;
 };
 
 void initQ(struct _Queue *logs){
   logs->front = 0;
   logs->lastSync = {-1, -1, -1};
+  logs->lastSense = {-1, -1, -1};
   logs->sz = 0;
 }
 
@@ -50,6 +54,7 @@ void Insert(struct _Queue *logs, struct _data *val){
     logs->logData[logs->front] = *val;
     logs->front = (logs->front == Q_SIZE-1)? 0 : logs->front+1;
   }
+  updateStatus(&(logs->lastSense));
 }
 
 struct _data *Remove(struct _Queue *logs){
@@ -64,6 +69,11 @@ struct _data *Remove(struct _Queue *logs){
 }
 
 void WriteQ(struct _Queue *logs){
+  /*
+   * write the whole queue and then send timestamp of most recent reading,
+   * the "logs.lastSense".
+   * Note when this transaction happened in "logs.lastSync"
+  */
   _data *dataPack;
   uint8_t i;
   while (logs->sz){
@@ -71,18 +81,27 @@ void WriteQ(struct _Queue *logs){
     for (i=0; i<CHANNELS; i++)
       if ( !port_w(2, dataPack->data+i) ) ;//error, do something
   }
+  uint8_t a[3] = {logs->lastSense.day, logs->lastSense.hour, logs->lastSense.min};
+  port_w(3, a);
   updateStatus(&(logs->lastSync));
 }
 
-int port_w(int sz, int *data){
- while ((UCSRA & (1<<UDRE)) == 0) {;}
- UDR = sz;
- uint8_t i;
- for (i=0; i<sz; i++){
-   while ((UCSRA & (1<<UDRE)) == 0) {;}
-   UDR = *(data)>>(i*8);
- }
- return 0;
+int port_w(int sz, void *data){
+  while ((UCSRA & (1<<UDRE)) == 0) {;}
+  UDR = sz;
+  uint8_t i;
+  if (sz == 2){
+    while ((UCSRA & (1<<UDRE)) == 0) {;}
+    UDR = *((int *)data);
+    while ((UCSRA & (1<<UDRE)) == 0) {;}
+    UDR = *((int *)data)>>8;
+  }
+  else
+    for (i=0; i<sz; i++){
+      while ((UCSRA & (1<<UDRE)) == 0) {;}
+      UDR = *((uint8_t*)data+i);
+    }
+  return 0;
 }
 
 void parse(char *rx){
@@ -134,10 +153,10 @@ int main(){
   TCCR2 |= (1<<WGM21) | (1<<CS22) | (1<<CS20); //set CTC and 128 prescaler
   //PORTB LED for visual feedback
   DDRB |= (1<<5);
-  
+
   struct _Queue logs;
   initQ(&logs);
-  
+
   sei();
   while (1){
     if (wFlag){
