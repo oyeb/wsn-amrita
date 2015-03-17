@@ -2,6 +2,7 @@
   Setup timer and serial.
   Poll ADC for "single conversion" every k ms and send over serial.
 */
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
