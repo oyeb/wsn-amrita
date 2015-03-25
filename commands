@@ -1,0 +1,39 @@
+#!bin/bash
+failed(){
+  echo " __   _    _ _"
+  echo "|_   /_\    |  | "
+  echo "|   /   \  _|_ |__"
+  exit 1
+}
+
+if [[ $1 == "clean" ]]; then
+  rm *.[adoe]* *.hex
+  exit 0
+else
+  fail=0
+  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ timer-main.c -o timer-main.o
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ utimer.c -o utimer.o
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avr-ar rcs libavrutils.a utimer.o
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avr-gcc -Os -Wl,--gc-sections -mmcu=atmega8 -o timer-main.elf timer-main.o libavrutils.a -L.
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 timer-main.elf timer-main.eep
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avr-objcopy -O ihex -R .eeprom timer-main.elf timer-main.hex
+  if [[ $? -ne 0 ]]; then
+    failed
+  fi
+  avrdude -C/usr/share/arduino/hardware/tools/avrdude.conf -v -patmega8 -carduino -P/dev/ttyUSB0 -b19200 -D -Uflash:w:timer-main.hex:i
+fi
