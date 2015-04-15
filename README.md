@@ -30,9 +30,9 @@ Log sensor data into EEPROM when low on power.
 * ADC has been tested, need to implement EEPROM.
 * ~~Need to decide the compression and data format~~ [completed].
 
-Makefile
+Build Process
 ---------
-Refer the wiki for more details on the build process.
+Refer the wiki for more details on the [build process].
 
 1. First compile `MAIN.c`. Linking happens later.<br>
 `avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ MAIN.c -o MAIN.o`
