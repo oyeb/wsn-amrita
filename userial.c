@@ -79,6 +79,7 @@ void portInit(uint16_t baud_rate){
 int port_w(int sz, void *data){
   int i;
 #if defined(UBRRH)
+  UDR = sz;
   for (i=0; i<sz; i++){
     while ((UCSRA & (1<<UDRE)) == 0) {;}
     UDR = *((uint8_t*)data+i);

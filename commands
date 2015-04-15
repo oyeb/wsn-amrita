@@ -5,35 +5,36 @@ failed(){
   echo "|   /   \  _|_ |__"
   exit 1
 }
-
+mainf="sermain"
+incf="userial"
 if [[ $1 == "clean" ]]; then
   rm *.[adoe]* *.hex
   exit 0
 else
   fail=0
-  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ sermain.c -o sermain.o
+  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ $mainf.c -o $mainf.o
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ userial.c -o userial.o
+  avr-gcc -c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega8 -DF_CPU=16000000L -MMD -DUSB_VID=null -DUSB_PID=null -DARDUINO=105 -D__PROG_TYPES_COMPAT__ $incf.c -o $incf.o
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avr-ar rcs libavrutils.a userial.o
+  avr-ar rcs libavrutils.a $incf.o
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avr-gcc -Os -Wl,--gc-sections -mmcu=atmega8 -o sermain.elf sermain.o libavrutils.a -L.
+  avr-gcc -Os -Wl,--gc-sections -mmcu=atmega8 -o $mainf.elf $mainf.o libavrutils.a -L.
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 sermain.elf sermain.eep
+  avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $mainf.elf $mainf.eep
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avr-objcopy -O ihex -R .eeprom sermain.elf sermain.hex
+  avr-objcopy -O ihex -R .eeprom $mainf.elf $mainf.hex
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avrdude -C/usr/share/arduino/hardware/tools/avrdude.conf -v -patmega8 -carduino -P/dev/ttyUSB0 -b19200 -D -Uflash:w:sermain.hex:i
+  avrdude -C/usr/share/arduino/hardware/tools/avrdude.conf -v -patmega8 -carduino -P/dev/ttyUSB0 -b19200 -D -Uflash:w:$mainf.hex:i
 fi

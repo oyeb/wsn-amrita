@@ -1,6 +1,7 @@
-*.o
-*.h
+*.[aohld]
 *.dll
 *~
 *.lib
-*.l
+*.eep
+*.elf
+*.hex
