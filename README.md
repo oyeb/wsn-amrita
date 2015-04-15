@@ -28,7 +28,7 @@ More info about the GUI can be found in the [wiki].<br>
 **[TODO]** This python script is old and needs to be replaced with the modularised GUI. It would serve as a good example code on how to use the listen() method in the GUI.
 
 
-Build Instructions
+Build Instructions [NEW]
 ----------------------
 *Your main file should be called `sermain.c`.* We'll remove that need once the makefiles are setup.
 
@@ -37,7 +37,13 @@ Build Instructions
    - Copy that into `SerControl.py` as indicated in the comments there.
    - Run the shell script `commands` by `$<your-dir> bash commands <portID>`. This will compile your code and upload it to the Arduino.
 3. To start the Serial Monitor, `<your working dir>$ python SerControl.py`
-=======
+
+Build Instructions [OLD]
+----------------------
+1. Open `serial.c` in the Arduino IDE and upload the code.
+2. Note the portID (in the bottom-right corner of ARDUINO IDE) used by the Arduino, for ex, it could be `/dev/tty/USB0`.
+   - Copy that into `SerControl.py` as indicated in the comments there.
+3. To start the Serial Monitor, `<your working dir>$ python SerControl.py`
 
 ***
 
