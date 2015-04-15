@@ -1,6 +1,8 @@
-*.o
-*.h
+*.[adhlo]
 *.dll
 *~
 *.lib
-*.l
+*.eep
+*.elf
+*.hex
+*.pyc
