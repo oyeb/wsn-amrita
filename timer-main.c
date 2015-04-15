@@ -2,6 +2,8 @@
 #include <avr/sleep.h>
 #include "utimer.h"
 
+extern volatile uint8_t m,h,d,s;
+
 int main(){
   //sleep-mode == idle mode
   MCUCR |= 1<<SE;
