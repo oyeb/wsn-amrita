@@ -5,14 +5,14 @@
  Right pane is where the user command history gets listed
   This pane also shows other helpful Error / Log messages
  There is one textEntry box where commands are typed
- 
- This program is solely to test and debug programs, it may never be 
+
+ This program is solely to test and debug programs, it may never be
  maintained for future or generalised. Not much time should be devoted to
  this.
- 
+
  CURRENTLY
    Fully Functional!!!
- 
+
  BUGS
    Terminal that is used to open this Program gets blocked even though the GUI
      window has been closed.
@@ -41,7 +41,7 @@ class Application(tk.Frame):
     self.q = Queue.Queue()
     self.io = ioThread(self.q, self.ser)
     self.createWidgets()
-  
+
   def createWidgets(self):
     self.oFrame = tk.Frame(self)
     self.iFrame = tk.Frame(self)
@@ -52,21 +52,21 @@ class Application(tk.Frame):
     self.end = tk.Button(self.iFrame, text='Disconnect', fg = "red", command=self.end_ser)
     self.quitButton = tk.Button(self.oFrame, text='Quit', fg = "magenta", command=self.quit)
     self.placeWidgets()
-  
+
   def placeWidgets(self):
-    self.iFrame.grid()    
+    self.iFrame.grid()
     self.iflux.grid()
-    self.oFrame.grid(row=0, column=1)    
-    self.oflux.grid()    
+    self.oFrame.grid(row=0, column=1)
+    self.oflux.grid()
     self.cmd.bind('<KeyPress-Return>', self.__parse)
     self.cmd.bind('<KeyPress-KP_Enter>', self.__parse)
     self.cmd.insert(0, '$ ')
     self.cmd.focus_force()
-    self.cmd.grid(row=1, column=0, sticky=tk.W, padx=40)    
-    self.start.grid()   
+    self.cmd.grid(row=1, column=0, sticky=tk.W, padx=40)
+    self.start.grid()
     self.end.grid(row=1, column=0, sticky=tk.E, padx=40)
     self.quitButton.grid(row=1, column=0, sticky=tk.E)
-  
+
   def init_ser(self):
     try:
       self.ser.port = PORT
@@ -83,7 +83,7 @@ class Application(tk.Frame):
         self.oflux.insert('1.0', '*_* Some thread error, restart propram!\n')
     except:
       self.oflux.insert('1.0', '*_* Error in setting up port @ ', PORT, '\n')
-  
+
   def processQ(self):
     while self.q.qsize():
       try:
@@ -100,7 +100,7 @@ class Application(tk.Frame):
       self.oflux.insert('1.0', '*_* Closed port: '+PORT+'\n')
       self.q.put('*_* Session closed normally --------------\n')
       self.serUP = False
-  
+
   def __parse(self, event):
     cmd = self.cmd.get()
     if not cmd=='$ ':
@@ -114,28 +114,25 @@ class ioThread:
     self.q = queue
     self.ser = ser
     self.running = False
-  
+
   def start(self):
-    self.running = True    
+    self.running = True
     self.influx = threading.Thread(target=self.listen)
-    self.influx.start()    
+    self.influx.start()
 
   def end(self):
     self.running = False
-  
+
   def listen(self):
     while self.running:
       data = self.ser.read()
       if not data == '':	#enter if-block only if some data has been sent to PC
         sz = ord(data)	#ord converts char to int
-        info = 0		#actual data sent in packet (currently only working with ints)
+        info = ''		#actual data sent in packet (currently only working with ints)
         for i in range(0,sz):
           data = self.ser.read()
-          info += ord(data)*(256**i)	#some trivial math
-        if info>60000:
-          self.q.put('* '+str(info))
-        else:
-          self.q.put(str(info))
+          info += data	#concatenating the chars
+        self.q.put(info)
 
 app = Application()
 app.master.title('T.A.L.K')
