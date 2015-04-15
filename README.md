@@ -37,6 +37,7 @@ Build Instructions
    - Copy that into `SerControl.py` as indicated in the comments there.
    - Run the shell script `commands` by `$<your-dir> bash commands <portID>`. This will compile your code and upload it to the Arduino.
 3. To start the Serial Monitor, `<your working dir>$ python SerControl.py`
+=======
 
 ***
 

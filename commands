@@ -36,5 +36,5 @@ else
   if [[ $? -ne 0 ]]; then
     failed
   fi
-  avrdude -C/usr/share/arduino/hardware/tools/avrdude.conf -v -patmega8 -carduino -P/dev/ttyUSB0 -b19200 -D -Uflash:w:$mainf.hex:i
+  avrdude -C/usr/share/arduino/hardware/tools/avrdude.conf -v -patmega8 -carduino -P$1 -b19200 -D -Uflash:w:$mainf.hex:i
 fi
