@@ -10,19 +10,11 @@ ser = serial.Serial()
 
 io = myThread.ioThread(gui.q, ser, gui)
 
-#logfile = open('logfile', 'w')
-
-def closeSer():
-  ser.flushInput()
-  ser.flushOutput()
-  ser.close()
-  gui.serUP = False
-
 def connect():
   try:
     ser.port = PORT
     ser.baudrate = 9600
-    ser.timeout = None
+    ser.timeout = 0.01
     ser.open()
     gui.serUP = True
     try:
@@ -38,7 +30,8 @@ def connect():
 
 def disconnect():
   if gui.serUP:
-    closeSer()
+    ser.close()
+    gui.serUp = False
     gui.right_put('^_^ Closed port: %s' % PORT)
     gui.q.put('^_^ Session closed normally --------------\n')
     #logfile.close()
@@ -56,7 +49,6 @@ def parse(event):
       gui.right_put('*_* First connect to the Serial Port!')
 
 ###################################
-
 gui.setup(connect, disconnect, parse)
 gui.master.title('Test Window')
 gui.mainloop()

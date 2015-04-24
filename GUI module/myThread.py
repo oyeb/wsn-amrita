@@ -8,6 +8,7 @@ class ioThread:
     self.count = 0
     self.snap = []
     self.parent = parent
+    self.lfile = open('logs', 'a')
 
   def start(self):
     self.running = True
@@ -16,6 +17,7 @@ class ioThread:
 
   def end(self):
     self.running = False
+    self.lfile.close()
 
   def show_snap(self):
     h = self.h
@@ -41,13 +43,13 @@ class ioThread:
           if (h == 24):
             h = 0
       msg = '{:2d} {:2d} {:2d} {:1.5f}'.format(h, m, s, self.snap.pop(0))
+      self.lfile.write(msg+'\n')
       self.q.put(msg)
-      #self.parent.logfile.write(msg+'\n')
     self.q.put('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
   def listen(self):
     while self.running:
-      data = self.ser.read()
+      data = self.ser.read(1)
       if not data == '':  #enter if-block only if some data has been sent to PC
         sz = ord(data)    #ord converts char to int
         if sz==2:

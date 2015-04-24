@@ -49,6 +49,8 @@ class Application(tk.Frame):
         self.iflux.insert('1.0', cue)
       except Queue.Empty:
         pass
+      if not self.serUP:
+        break
     if self.serUP:
       self.after(10, self.processQ)
     else:
