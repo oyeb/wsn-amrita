@@ -8,6 +8,7 @@ class Application(tk.Frame):
     self.q = Queue.Queue()
     self.serUP = False
     self.grid()
+    self.msg = ''
     self.createWidgets()
 
   def createWidgets(self):
@@ -16,7 +17,6 @@ class Application(tk.Frame):
     self.iflux = tk.Text(self.iFrame, height=24, padx=5, pady=5, relief=tk.RIDGE)
     self.oflux = tk.Text(self.oFrame, height=24, padx=5, pady=5, relief=tk.RIDGE, bg="pink")
     self.cmd = tk.Entry(self.oFrame, bg="cyan")
-    self.quitButton = tk.Button(self.oFrame, text='Quit', fg = "magenta", command = self.quit)
     self.placeWidgets()
 
   def placeWidgets(self):
@@ -27,7 +27,6 @@ class Application(tk.Frame):
     self.cmd.insert(0, '$ ')
     self.cmd.focus_force()
     self.cmd.grid(row=1, column=0, sticky=tk.W, padx=40)
-    self.quitButton.grid(row=1, column=0, sticky=tk.E)
 
   def setup(self, con, discon, parse):
     self.start = tk.Button(self.iFrame, text='Connect', fg = "green", command=con)
@@ -44,10 +43,13 @@ class Application(tk.Frame):
     self.iflux.insert('1.0', msg+'\n')
 
   def processQ(self):
-    while self.q.qsize() <> 0:
+    while self.q.qsize() > 0:
       try:
-        self.iflux.insert('1.0', str(self.q.get(0))+'\n')
+        cue = str(self.q.get(0))+'\n'
+        self.iflux.insert('1.0', cue)
       except Queue.Empty:
         pass
     if self.serUP:
       self.after(10, self.processQ)
+    else:
+      return

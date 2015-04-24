@@ -136,7 +136,7 @@ class ioThread:
         for i in range(0,sz):
           data = self.ser.read()
           info += ord(data)*(256**i)	#some trivial math
-        self.q.put(info * 0.004882813)
+        self.q.put(info)
         '''
         if info>60000:
           self.q.put('* '+str(info))
