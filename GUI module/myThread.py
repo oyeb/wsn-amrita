@@ -8,7 +8,7 @@ class ioThread:
     self.count = 0
     self.snap = []
     self.parent = parent
-    self.lfile = open('logs', 'a')
+    self.lfile = open('logs2', 'a')
 
   def start(self):
     self.running = True
@@ -42,9 +42,11 @@ class ioThread:
           h += 1
           if (h == 24):
             h = 0
-      msg = '{:2d} {:2d} {:2d} {:1.5f}'.format(h, m, s, self.snap.pop(0))
-      self.lfile.write(msg+'\n')
-      self.q.put(msg)
+      datum = self.snap.pop(0)
+      gui_msg = '{:2d} {:2d} {:2d} {:1.5f}'.format(h, m, s, datum)
+      file_msg = '{:d}:{:d}:{:d} {:1.5f}'.format(h, m, s, datum)
+      self.lfile.write(file_msg+'\n')
+      self.q.put(gui_msg)
     self.q.put('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
   def listen(self):

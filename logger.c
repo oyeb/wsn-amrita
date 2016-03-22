@@ -180,6 +180,7 @@ int main(){
       ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
       //Enable and 128 prescaler
       ADMUX &= ~(1<<MUX0|1<<MUX1|1<<MUX2|1<<MUX3); //select ADC0 pin
+      while (ms < 500); //give time
       ADCSRA |= (1<<ADSC); //Start conversion
       while (ADCSRA & (1<<ADSC)); //wait till its done
       senseD.data[0] = (ADCL + (ADCH<<8)); //pack it in senseD
